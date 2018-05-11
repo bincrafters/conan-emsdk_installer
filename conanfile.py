@@ -16,7 +16,8 @@ class EmSDKInstallerConan(ConanFile):
 
     settings = {
         "os_build": ['Windows', 'Linux', 'Macos'],
-        "arch_build": ['x86', 'x86_64']
+        "arch_build": ['x86', 'x86_64'],
+        "compiler": ['clang']
     }
     no_copy_source = True
 
@@ -35,6 +36,12 @@ class EmSDKInstallerConan(ConanFile):
     def package(self):
         self.copy(pattern="LICENSE", dst="licenses", src=self.source_folder)
         self.copy(pattern='*', dst='.', src=os.path.join(self.source_folder, 'emsdk'))
+
+    def define_tool_var(self, name, value):
+        suffix = '.bat' if os.name == 'nt' else ''
+        path = os.path.join(self.package_folder, 'emscripten', self.version, '%s%s' % (value, suffix))
+        self.output.info('Creating %s environment variable: %s' % (name, path))
+        return path
 
     def package_info(self):
         emsdk = self.package_folder
@@ -63,3 +70,8 @@ class EmSDKInstallerConan(ConanFile):
 
         self.output.info('Creating CONAN_CMAKE_TOOLCHAIN_FILE environment variable: %s' % toolchain)
         self.env_info.CONAN_CMAKE_TOOLCHAIN_FILE = toolchain
+
+        self.env_info.CC = self.define_tool_var('CC', 'emcc')
+        self.env_info.CXX = self.define_tool_var('CXX', 'em++')
+        self.env_info.RANLIB = self.define_tool_var('RANLIB', 'emranlib')
+        self.env_info.AR = self.define_tool_var('AR', 'emar')
