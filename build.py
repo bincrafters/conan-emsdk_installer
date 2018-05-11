@@ -21,7 +21,7 @@ if __name__ == "__main__":
         settings['os_build'] = 'Windows'
     elif platform.system() == 'Linux':
         settings['os_build'] = 'Linux'
-    elif platofmr.system() == 'Darwin':
+    elif platform.system() == 'Darwin':
         settings['os_build'] = 'Macos'
 
     if 'ARCH_BUILD' in os.environ:
