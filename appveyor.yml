@@ -7,9 +7,6 @@ environment:
 
     matrix:
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-          ARCH_BUILD: x86
-        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-          ARCH_BUILD: x86_64
 
 install:
   - set PATH=%PATH%;%PYTHON%/Scripts/

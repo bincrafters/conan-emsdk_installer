@@ -11,15 +11,9 @@ osx: &osx
 matrix:
    include:
       - <<: *linux
-        env: CONAN_DOCKER_IMAGE=bincrafters/docker-centos-gcc48 ARCH_BUILD=x86
-      - <<: *linux
-        env: CONAN_DOCKER_IMAGE=bincrafters/docker-centos-gcc48 ARCH_BUILD=x86_64
+        env: CONAN_DOCKER_IMAGE=bincrafters/docker-centos-gcc48
       - <<: *osx
         osx_image: xcode9
-        env: ARCH_BUILD=x86
-      - <<: *osx
-        osx_image: xcode9
-        env: ARCH_BUILD=x86_64
 
 install:
   - chmod +x .travis/install.sh

@@ -16,7 +16,7 @@ class EmSDKInstallerConan(ConanFile):
 
     settings = {
         "os_build": ['Windows', 'Linux', 'Macos'],
-        "arch_build": ['x86', 'x86_64'],
+        "arch_build": ['x86_64'],
         "compiler": ['clang']
     }
     no_copy_source = True
