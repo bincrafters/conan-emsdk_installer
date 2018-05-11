@@ -24,19 +24,20 @@ class EmSDKInstallerConan(ConanFile):
 
 
     def source(self):
-        source_url = 'https://github.com/juj/emsdk.git'
-        self.run('git clone --depth 1 %s' % source_url)
+        source_url = 'https://github.com/juj/emsdk/archive/master.zip'
+        tools.get(source_url)
 
 
     def build(self):
-        with tools.chdir(os.path.join(self.source_folder, 'emsdk')):
+        with tools.chdir(os.path.join(self.source_folder, 'emsdk-master')):
             emsdk = 'emsdk.bat' if os.name == 'nt' else './emsdk'
+            self.run('%s update' % emsdk)
             self.run('%s install sdk-%s-64bit' % (emsdk, self.version))
             self.run('%s activate sdk-%s-64bit --embedded' % (emsdk, self.version))
 
     def package(self):
         self.copy(pattern="LICENSE", dst="licenses", src=self.source_folder)
-        self.copy(pattern='*', dst='.', src=os.path.join(self.source_folder, 'emsdk'))
+        self.copy(pattern='*', dst='.', src=os.path.join(self.source_folder, 'emsdk-master'))
 
     def define_tool_var(self, name, value):
         suffix = '.bat' if os.name == 'nt' else ''
