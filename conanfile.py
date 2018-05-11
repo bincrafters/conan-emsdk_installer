@@ -7,7 +7,7 @@ import os
 
 class EmSDKInstallerConan(ConanFile):
     name = "emsdk_installer"
-    version = "1.38.0"
+    version = "1.37.40"
     description = "Emscripten is an Open Source LLVM to JavaScript compiler"
     url = "https://github.com/bincrafters/conan-emsdk_installer"
     homepage = "https://github.com/kripken/emscripten"
