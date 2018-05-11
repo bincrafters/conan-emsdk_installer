@@ -1,83 +1,65 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from conans import ConanFile, CMake, tools
+from conans import ConanFile, tools
 import os
 
 
-class LibnameConan(ConanFile):
-    name = "libname"
-    version = "0.0.0"
-    description = "Keep it short"
-    url = "https://github.com/bincrafters/conan-libname"
-    homepage = "https://github.com/original_author/original_lib"
-
-    # Indicates License type of the packaged library
+class EmSDKInstallerConan(ConanFile):
+    name = "emsdk_installer"
+    version = "1.38.0"
+    description = "Emscripten is an Open Source LLVM to JavaScript compiler"
+    url = "https://github.com/bincrafters/conan-emsdk_installer"
+    homepage = "https://github.com/kripken/emscripten"
     license = "MIT"
-
-    # Packages the license for the conanfile.py
     exports = ["LICENSE.md"]
 
-    # Remove following lines if the target lib does not use cmake.
-    exports_sources = ["CMakeLists.txt"]
-    generators = "cmake"
+    settings = {
+        "os_build": ['Windows', 'Linux', 'Macos'],
+        "arch_build": ['x86', 'x86_64']
+    }
+    no_copy_source = True
 
-    # Options may need to change depending on the packaged library.
-    settings = "os", "arch", "compiler", "build_type"
-    options = {"shared": [True, False], "fPIC": [True, False]}
-    default_options = "shared=False", "fPIC=True"
-
-    # Custom attributes for Bincrafters recipe conventions
-    source_subfolder = "source_subfolder"
-    build_subfolder = "build_subfolder"
-
-    # Use version ranges for dependencies unless there's a reason not to
-    # Update 2/9/18 - Per conan team, ranges are slow to resolve.
-    # So, with libs like zlib, updates are very rare, so we now use static version
-
-
-    requires = (
-        "OpenSSL/[>=1.0.2l]@conan/stable",
-        "zlib/1.2.11@conan/stable"
-    )
-
-    def config_options(self):
-        if self.settings.os == 'Windows':
-            del self.options.fPIC
 
     def source(self):
-        source_url = "https://github.com/libauthor/libname"
-        tools.get("{0}/archive/v{1}.tar.gz".format(source_url, self.version))
-        extracted_dir = self.name + "-" + self.version
+        source_url = 'https://github.com/juj/emsdk.git'
+        self.run('git clone --depth 1 %s' % source_url)
 
-        #Rename to "source_subfolder" is a convention to simplify later steps
-        os.rename(extracted_dir, self.source_subfolder)
-
-    def configure_cmake(self):
-        cmake = CMake(self)
-        cmake.definitions["BUILD_TESTS"] = False # example
-        if self.settings.os != 'Windows':
-            cmake.definitions['CMAKE_POSITION_INDEPENDENT_CODE'] = self.options.fPIC
-        cmake.configure(build_folder=self.build_subfolder)
-        return cmake
 
     def build(self):
-        cmake = self.configure_cmake()
-        cmake.build()
+        with tools.chdir(os.path.join(self.source_folder, 'emsdk')):
+            emsdk = 'emsdk.bat' if os.name == 'nt' else './emsdk'
+            self.run('%s install sdk-%s-64bit' % (emsdk, self.version))
+            self.run('%s activate sdk-%s-64bit --embedded' % (emsdk, self.version))
 
     def package(self):
-        self.copy(pattern="LICENSE", dst="licenses", src=self.source_subfolder)
-        cmake = self.configure_cmake()
-        cmake.install()
-        # If the CMakeLists.txt has a proper install method, the steps below may be redundant
-        # If so, you can just remove the lines below
-        include_folder = os.path.join(self.source_subfolder, "include")
-        self.copy(pattern="*", dst="include", src=include_folder)
-        self.copy(pattern="*.dll", dst="bin", keep_path=False)
-        self.copy(pattern="*.lib", dst="lib", keep_path=False)
-        self.copy(pattern="*.a", dst="lib", keep_path=False)
-        self.copy(pattern="*.so*", dst="lib", keep_path=False)
-        self.copy(pattern="*.dylib", dst="lib", keep_path=False)
+        self.copy(pattern="LICENSE", dst="licenses", src=self.source_folder)
+        self.copy(pattern='*', dst='.', src=os.path.join(self.source_folder, 'emsdk'))
 
     def package_info(self):
-        self.cpp_info.libs = tools.collect_libs(self)
+        emsdk = self.package_folder
+        em_config = os.path.join(emsdk, '.emscripten')
+        emscripten = os.path.join(emsdk, 'emscripten', self.version)
+        em_cache = os.path.join(emsdk, '.emscripten_cache')
+        toolchain = os.path.join(emscripten, 'cmake', 'Modules', 'Platform', 'Emscripten.cmake')
+
+        self.output.info('Appending PATH environment variable: %s' % emsdk)
+        self.env_info.PATH.append(emsdk)
+
+        self.output.info('Appending PATH environment variable: %s' % emscripten)
+        self.env_info.PATH.append(emscripten)
+
+        self.output.info('Creating EMSDK environment variable: %s' % emsdk)
+        self.env_info.EMSDK = emsdk
+
+        self.output.info('Creating EMSCRIPTEN environment variable: %s' % emscripten)
+        self.env_info.EMSCRIPTEN = emscripten
+
+        self.output.info('Creating EM_CONFIG environment variable: %s' % em_config)
+        self.env_info.EM_CONFIG = em_config
+
+        self.output.info('Creating EM_CACHE environment variable: %s' % em_cache)
+        self.env_info.EM_CACHE = em_cache
+
+        self.output.info('Creating CONAN_CMAKE_TOOLCHAIN_FILE environment variable: %s' % toolchain)
+        self.env_info.CONAN_CMAKE_TOOLCHAIN_FILE = toolchain

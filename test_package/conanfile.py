@@ -17,10 +17,8 @@ class TestPackageConan(ConanFile):
 
     def test(self):
         with tools.environment_append(RunEnvironment(self).vars):
-            bin_path = os.path.join("bin", "test_package")
-            if self.settings.os == "Windows":
-                self.run(bin_path)
-            elif self.settings.os == "Macos":
-                self.run("DYLD_LIBRARY_PATH=%s %s" % (os.environ.get('DYLD_LIBRARY_PATH', ''), bin_path))
-            else:
-                self.run("LD_LIBRARY_PATH=%s %s" % (os.environ.get('LD_LIBRARY_PATH', ''), bin_path))
+            with tools.chdir('bin'):
+                node = 'node.exe' if os.name == 'nt' else 'node'
+                # FIXME : hard-coded version of nodejs
+                node = os.path.join(os.environ['EMSDK'], 'node', '8.9.1_64bit', 'bin', node)
+                self.run('%s test_package.js' % node)
