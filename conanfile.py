@@ -20,6 +20,7 @@ class EmSDKInstallerConan(ConanFile):
         "compiler": ['clang']
     }
     no_copy_source = True
+    short_paths = True
 
 
     def source(self):
