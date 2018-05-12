@@ -30,6 +30,8 @@ class EmSDKInstallerConan(ConanFile):
     def build(self):
         with tools.chdir(os.path.join(self.source_folder, 'emsdk-master')):
             emsdk = 'emsdk.bat' if os.name == 'nt' else './emsdk'
+            if os.name == 'posix':
+                os.chmod('emsdk', os.stat('emsdk').st_mode | 0o111)
             self.run('%s update' % emsdk)
             self.run('%s install sdk-%s-64bit' % (emsdk, self.version))
             self.run('%s activate sdk-%s-64bit --embedded' % (emsdk, self.version))
