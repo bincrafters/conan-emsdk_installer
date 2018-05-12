@@ -11,7 +11,7 @@ osx: &osx
 matrix:
    include:
       - <<: *linux
-        env: CONAN_DOCKER_IMAGE=bincrafters/docker-centos-gcc48
+        env: CONAN_DOCKER_IMAGE=lasote/conangcc49
       - <<: *osx
         osx_image: xcode9
 
