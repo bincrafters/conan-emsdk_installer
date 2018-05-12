@@ -3,6 +3,7 @@
 
 from conans import ConanFile, tools
 import os
+import shutil
 
 
 class EmSDKInstallerConan(ConanFile):
@@ -22,11 +23,9 @@ class EmSDKInstallerConan(ConanFile):
     no_copy_source = True
     short_paths = True
 
-
     def source(self):
         source_url = 'https://github.com/juj/emsdk/archive/master.zip'
         tools.get(source_url)
-
 
     def build(self):
         with tools.chdir(os.path.join(self.source_folder, 'emsdk-master')):
@@ -37,16 +36,22 @@ class EmSDKInstallerConan(ConanFile):
 
     def package(self):
         self.copy(pattern="LICENSE", dst="licenses", src=self.source_folder)
-        self.copy(pattern='*', dst='.', src=os.path.join(self.source_folder, 'emsdk-master'))
+        src = os.path.join(self.source_folder, 'emsdk-master')
+        dst = os.path.join(self.package_folder, 'emsdk')
+        if os.name == 'nt':
+            src = '\\\\?\\' + os.path.abspath(src)
+            dst = '\\\\?\\' + os.path.abspath(dst)
+        if not os.path.isdir(dst):
+            shutil.copytree(src, dst)
 
     def define_tool_var(self, name, value):
         suffix = '.bat' if os.name == 'nt' else ''
-        path = os.path.join(self.package_folder, 'emscripten', self.version, '%s%s' % (value, suffix))
+        path = os.path.join(self.package_folder, 'emsdk', 'emscripten', self.version, '%s%s' % (value, suffix))
         self.output.info('Creating %s environment variable: %s' % (name, path))
         return path
 
     def package_info(self):
-        emsdk = self.package_folder
+        emsdk = os.path.join(self.package_folder, 'emsdk')
         em_config = os.path.join(emsdk, '.emscripten')
         emscripten = os.path.join(emsdk, 'emscripten', self.version)
         em_cache = os.path.join(emsdk, '.emscripten_cache')
