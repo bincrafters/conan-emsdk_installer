@@ -52,9 +52,16 @@ class EmSDKInstallerConan(ConanFile):
 
     @staticmethod
     def _create_dummy_file(directory):
-        os.makedirs(directory)
+        if not os.path.isdir(directory):
+            os.makedirs(directory)
         with open(os.path.join(directory, "dummy"), "w") as f:
             f.write("\n")
+
+    @staticmethod
+    def _chmod_plus_x(filename):
+        if os.name == 'posix':
+            os.chmod(filename, os.stat(filename).st_mode | 0o111)
+
 
     def build(self):
         emsdk_root = os.path.join(self.source_folder, self._source_subfolder)
@@ -63,8 +70,7 @@ class EmSDKInstallerConan(ConanFile):
 
             with tools.chdir(emsdk_root):
                 emsdk = 'emsdk.bat' if os.name == 'nt' else './emsdk'
-                if os.name == 'posix':
-                    os.chmod('emsdk', os.stat('emsdk').st_mode | 0o111)
+                self._chmod_plus_x('emsdk')
                 self._run('%s update' % emsdk)
 
                 # skip undesired installation of tools (nodejs, java, python)
@@ -89,6 +95,7 @@ class EmSDKInstallerConan(ConanFile):
     def define_tool_var(self, name, value):
         suffix = '.bat' if os.name == 'nt' else ''
         path = os.path.join(self.package_folder, 'e', 'emscripten', self.version, '%s%s' % (value, suffix))
+        self._chmod_plus_x(path)
         self.output.info('Creating %s environment variable: %s' % (name, path))
         return path
 
