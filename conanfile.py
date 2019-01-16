@@ -64,13 +64,13 @@ class EmSDKInstallerConan(ConanFile):
 
     def define_tool_var(self, name, value):
         suffix = '.bat' if os.name == 'nt' else ''
-        path = os.path.join(self.package_folder, 'emsdk', 'emscripten', self.version, '%s%s' % (value, suffix))
+        path = os.path.join(self.package_folder, 'emscripten', self.version, '%s%s' % (value, suffix))
         self._chmod_plus_x(path)
         self.output.info('Creating %s environment variable: %s' % (name, path))
         return path
 
     def package_info(self):
-        emsdk = os.path.join(self.package_folder, 'emsdk')
+        emsdk = self.package_folder
         em_config = os.path.join(emsdk, '.emscripten')
         emscripten = os.path.join(emsdk, 'emscripten', self.version)
         em_cache = os.path.join(emsdk, '.emscripten_cache')
