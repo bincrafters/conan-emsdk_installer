@@ -3,8 +3,6 @@
 
 from conans import ConanFile, tools
 import os
-import shutil
-import sys
 
 
 class EmSDKInstallerConan(ConanFile):
@@ -22,29 +20,12 @@ class EmSDKInstallerConan(ConanFile):
     }
     no_copy_source = True
     short_paths = True
-    requires = "nodejs_installer/10.15.0@bincrafters/stable", "java_installer/8.0.153@bincrafters/stable"
+    requires = "nodejs_installer/10.15.0@bincrafters/stable"
     _source_subfolder = "emsdk-master"
 
     def source(self):
         source_url = 'https://github.com/juj/emsdk/archive/master.zip'
         tools.get(source_url)
-
-    def _create_config(self):
-        home = os.environ["USERPROFILE"] if os.name == "nt" else os.environ["HOME"]
-        #emsdk_config = os.path.join(home, ".emscripten")
-
-        emsdk_config = os.path.join(self.source_folder, self._source_subfolder, ".emscripten")
-        with open(emsdk_config, "w") as f:
-            #python_exe = sys.executable
-            java_exe = tools.which("java")
-            node_exe = tools.which("node")
-            #self.output.info("using python: %s" % python_exe)
-            self.output.info("using java: %s" % java_exe)
-            self.output.info("using node: %s" % node_exe)
-            f.write("import os\n")
-            #f.write("PYTHON='%s'\n" % python_exe)
-            f.write("JAVA='%s'\n" % java_exe)
-            f.write("NODE_JS='%s'\n" % node_exe)
 
     def _run(self, command):
         self.output.info(command)
@@ -62,45 +43,34 @@ class EmSDKInstallerConan(ConanFile):
         if os.name == 'posix':
             os.chmod(filename, os.stat(filename).st_mode | 0o111)
 
-
     def build(self):
         emsdk_root = os.path.join(self.source_folder, self._source_subfolder)
-        with tools.environment_append({"EM_CONFIG": emsdk_root}):
-            self._create_config()
+        with tools.chdir(emsdk_root):
+            emsdk = 'emsdk.bat' if os.name == 'nt' else './emsdk'
+            self._chmod_plus_x('emsdk')
+            self._run('%s update' % emsdk)
 
-            with tools.chdir(emsdk_root):
-                emsdk = 'emsdk.bat' if os.name == 'nt' else './emsdk'
-                self._chmod_plus_x('emsdk')
-                self._run('%s update' % emsdk)
+            # skip undesired installation of tools (nodejs, java, python)
+            # FIXME: if someone knows easier way to skip installation of tools, please tell me
+            self._create_dummy_file(os.path.join("node", "8.9.1_64bit"))
+            self._create_dummy_file(os.path.join("java", "8.152_64bit"))
 
-                # skip undesired installation of tools (nodejs, java, python)
-                # FIXME: if someone knows easier way to skip installation of tools, please tell me
-                self._create_dummy_file(os.path.join("node", "8.9.1_64bit"))
-                #self._create_dummy_file(os.path.join("python", "2.7.13.1_64bit"))
-                self._create_dummy_file(os.path.join("java", "8.152_64bit"))
-
-                self._run('%s install sdk-%s-64bit' % (emsdk, self.version))
-                self._run('%s activate sdk-%s-64bit --embedded' % (emsdk, self.version))
+            self._run('%s install sdk-%s-64bit' % (emsdk, self.version))
+            self._run('%s activate sdk-%s-64bit --embedded' % (emsdk, self.version))
 
     def package(self):
         self.copy(pattern="LICENSE", dst="licenses", src=self.source_folder)
-        src = os.path.join(self.source_folder, 'emsdk-master')
-        dst = os.path.join(self.package_folder, 'e')
-        if os.name == 'nt':
-            src = '\\\\?\\' + os.path.abspath(src)
-            dst = '\\\\?\\' + os.path.abspath(dst)
-        if not os.path.isdir(dst):
-            shutil.copytree(src, dst)
+        self.copy(pattern='*', dst='.', src=os.path.join(self.source_folder, 'emsdk-master'))
 
     def define_tool_var(self, name, value):
         suffix = '.bat' if os.name == 'nt' else ''
-        path = os.path.join(self.package_folder, 'e', 'emscripten', self.version, '%s%s' % (value, suffix))
+        path = os.path.join(self.package_folder, 'emsdk', 'emscripten', self.version, '%s%s' % (value, suffix))
         self._chmod_plus_x(path)
         self.output.info('Creating %s environment variable: %s' % (name, path))
         return path
 
     def package_info(self):
-        emsdk = os.path.join(self.package_folder, 'e')
+        emsdk = os.path.join(self.package_folder, 'emsdk')
         em_config = os.path.join(emsdk, '.emscripten')
         emscripten = os.path.join(emsdk, 'emscripten', self.version)
         em_cache = os.path.join(emsdk, '.emscripten_cache')
