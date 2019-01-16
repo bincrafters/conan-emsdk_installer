@@ -8,7 +8,7 @@ import shutil
 
 class EmSDKInstallerConan(ConanFile):
     name = "emsdk_installer"
-    version = "1.37.40"
+    version = "1.38.22"
     description = "Emscripten is an Open Source LLVM to JavaScript compiler"
     url = "https://github.com/bincrafters/conan-emsdk_installer"
     homepage = "https://github.com/kripken/emscripten"
@@ -17,8 +17,7 @@ class EmSDKInstallerConan(ConanFile):
 
     settings = {
         "os_build": ['Windows', 'Linux', 'Macos'],
-        "arch_build": ['x86_64'],
-        "compiler": ['clang']
+        "arch_build": ['x86_64']
     }
     no_copy_source = True
     short_paths = True
