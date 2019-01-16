@@ -11,7 +11,7 @@ osx: &osx
 matrix:
    include:
       - <<: *linux
-        env: CONAN_DOCKER_IMAGE=conanio/gcc7-centos6
+        env: CONAN_DOCKER_IMAGE=conanio/gcc8
       - <<: *osx
         osx_image: xcode9
 
