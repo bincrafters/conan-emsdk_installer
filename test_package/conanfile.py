@@ -7,18 +7,16 @@ import os
 
 
 class TestPackageConan(ConanFile):
-    settings = "os", "compiler", "build_type", "arch"
+    settings = "os", "build_type", "arch", "compiler"
     generators = "cmake"
 
     def build(self):
-        cmake = CMake(self, generator='NMake Makefiles' if os.name == 'nt' else 'Unix Makefiles')
+        cmake = CMake(self, generator='MinGW Makefiles' if os.name == 'nt' else 'Unix Makefiles', parallel=False)
+        cmake.definitions["CONAN_DISABLE_CHECK_COMPILER"] = True
         cmake.configure()
         cmake.build()
+        #self.run("cmake --build %s --config Release" % self.build_folder)
 
     def test(self):
-        with tools.environment_append(RunEnvironment(self).vars):
-            with tools.chdir('bin'):
-                node = 'node.exe' if os.name == 'nt' else 'node'
-                # FIXME : hard-coded version of nodejs
-                node = os.path.join(os.environ['EMSDK'], 'node', '8.9.1_64bit', 'bin', node)
-                self.run('%s test_package.js' % node)
+        test_file = os.path.join(self.build_folder, "bin", "test_package.js")
+        self.run('node %s' % test_file, run_environment=True)

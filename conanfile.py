@@ -4,6 +4,7 @@
 from conans import ConanFile, tools
 import os
 import shutil
+import sys
 
 
 class EmSDKInstallerConan(ConanFile):
@@ -21,19 +22,59 @@ class EmSDKInstallerConan(ConanFile):
     }
     no_copy_source = True
     short_paths = True
+    requires = "nodejs_installer/10.15.0@bincrafters/stable", "java_installer/8.0.153@bincrafters/stable"
+    _source_subfolder = "emsdk-master"
 
     def source(self):
         source_url = 'https://github.com/juj/emsdk/archive/master.zip'
         tools.get(source_url)
 
+    def _create_config(self):
+        home = os.environ["USERPROFILE"] if os.name == "nt" else os.environ["HOME"]
+        #emsdk_config = os.path.join(home, ".emscripten")
+
+        emsdk_config = os.path.join(self.source_folder, self._source_subfolder, ".emscripten")
+        with open(emsdk_config, "w") as f:
+            #python_exe = sys.executable
+            java_exe = tools.which("java")
+            node_exe = tools.which("node")
+            #self.output.info("using python: %s" % python_exe)
+            self.output.info("using java: %s" % java_exe)
+            self.output.info("using node: %s" % node_exe)
+            f.write("import os\n")
+            #f.write("PYTHON='%s'\n" % python_exe)
+            f.write("JAVA='%s'\n" % java_exe)
+            f.write("NODE_JS='%s'\n" % node_exe)
+
+    def _run(self, command):
+        self.output.info(command)
+        self.run(command)
+
+    @staticmethod
+    def _create_dummy_file(directory):
+        os.makedirs(directory)
+        with open(os.path.join(directory, "dummy"), "w") as f:
+            f.write("\n")
+
     def build(self):
-        with tools.chdir(os.path.join(self.source_folder, 'emsdk-master')):
-            emsdk = 'emsdk.bat' if os.name == 'nt' else './emsdk'
-            if os.name == 'posix':
-                os.chmod('emsdk', os.stat('emsdk').st_mode | 0o111)
-            self.run('%s update' % emsdk)
-            self.run('%s install sdk-%s-64bit' % (emsdk, self.version))
-            self.run('%s activate sdk-%s-64bit --embedded' % (emsdk, self.version))
+        emsdk_root = os.path.join(self.source_folder, self._source_subfolder)
+        with tools.environment_append({"EM_CONFIG": emsdk_root}):
+            self._create_config()
+
+            with tools.chdir(emsdk_root):
+                emsdk = 'emsdk.bat' if os.name == 'nt' else './emsdk'
+                if os.name == 'posix':
+                    os.chmod('emsdk', os.stat('emsdk').st_mode | 0o111)
+                self._run('%s update' % emsdk)
+
+                # skip undesired installation of tools (nodejs, java, python)
+                # FIXME: if someone knows easier way to skip installation of tools, please tell me
+                self._create_dummy_file(os.path.join("node", "8.9.1_64bit"))
+                #self._create_dummy_file(os.path.join("python", "2.7.13.1_64bit"))
+                self._create_dummy_file(os.path.join("java", "8.152_64bit"))
+
+                self._run('%s install sdk-%s-64bit' % (emsdk, self.version))
+                self._run('%s activate sdk-%s-64bit --embedded' % (emsdk, self.version))
 
     def package(self):
         self.copy(pattern="LICENSE", dst="licenses", src=self.source_folder)
