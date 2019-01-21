@@ -1,6 +1,6 @@
 [![Download](https://api.bintray.com/packages/bincrafters/public-conan/emsdk_installer%3Abincrafters/images/download.svg) ](https://bintray.com/bincrafters/public-conan/emsdk_installer%3Abincrafters/_latestVersion)
-[![Build Status](https://travis-ci.org/bincrafters/conan-emsdk_installer.svg?branch=testing%2F1.38.0)](https://travis-ci.org/bincrafters/conan-emsdk_installer)
-[![Build status](https://ci.appveyor.com/api/projects/status/github/bincrafters/conan-emsdk_installer?branch=testing%2F1.38.0&svg=true)](https://ci.appveyor.com/project/bincrafters/conan-emsdk_installer)
+[![Build Status](https://travis-ci.com/bincrafters/conan-emsdk_installer.svg?branch=testing%2F1.38.0)](https://travis-ci.com/bincrafters/conan-emsdk_installer)
+[![Build status](https://ci.appveyor.com/api/projects/status/github/bincrafters/conan-emsd-installer?branch=testing%2F1.38.0&svg=true)](https://ci.appveyor.com/project/bincrafters/conan-emsdk-installer)
 
 [Conan.io](https://conan.io) package recipe for [*emsdk_installer*](https://github.com/kripken/emscripten).
 
