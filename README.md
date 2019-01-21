@@ -1,6 +1,6 @@
 [![Download](https://api.bintray.com/packages/bincrafters/public-conan/emsdk_installer%3Abincrafters/images/download.svg) ](https://bintray.com/bincrafters/public-conan/emsdk_installer%3Abincrafters/_latestVersion)
-[![Build Status](https://travis-ci.com/bincrafters/conan-emsdk_installer.svg?branch=testing%2F1.38.0)](https://travis-ci.com/bincrafters/conan-emsdk_installer)
-[![Build status](https://ci.appveyor.com/api/projects/status/github/bincrafters/conan-emsdk-installer?branch=testing%2F1.38.0&svg=true)](https://ci.appveyor.com/project/bincrafters/conan-emsdk-installer)
+[![Build Status](https://travis-ci.com/bincrafters/conan-emsdk_installer.svg?branch=stable%2F1.38.22)](https://travis-ci.com/bincrafters/conan-emsdk_installer)
+[![Build status](https://ci.appveyor.com/api/projects/status/github/bincrafters/conan-emsdk_installer?branch=stable%2F1.38.22&svg=true)](https://ci.appveyor.com/project/bincrafters/conan-emsdk-installer)
 
 [Conan.io](https://conan.io) package recipe for [*emsdk_installer*](https://github.com/kripken/emscripten).
 
@@ -12,14 +12,14 @@ The packages generated with this **conanfile** can be found on [Bintray](https:/
 
 ### Basic setup
 
-    $ conan install emsdk_installer/1.38.0@bincrafters/testing
+    $ conan install emsdk_installer/1.38.22@bincrafters/testing
 
 ### Project setup
 
 If you handle multiple dependencies in your project is better to add a *conanfile.txt*
 
     [requires]
-    emsdk_installer/1.38.0@bincrafters/testing
+    emsdk_installer/1.38.22@bincrafters/testing
 
 
 Complete the installation of requirements for your project running:
@@ -46,7 +46,7 @@ The following command both runs all the steps of the conan file, and publishes t
 
 ## Upload
 
-    $ conan upload emsdk_installer/1.38.0@bincrafters/testing --all -r bincrafters
+    $ conan upload emsdk_installer/1.38.22@bincrafters/testing --all -r bincrafters
 
 
 ## Conan Recipe License
