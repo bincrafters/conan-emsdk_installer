@@ -7,7 +7,7 @@ import os
 
 class EmSDKInstallerConan(ConanFile):
     name = "emsdk_installer"
-    version = "1.38.22"
+    version = "1.38.29"
     description = "Emscripten is an Open Source LLVM to JavaScript compiler"
     url = "https://github.com/bincrafters/conan-emsdk_installer"
     homepage = "https://github.com/kripken/emscripten"
@@ -54,7 +54,7 @@ class EmSDKInstallerConan(ConanFile):
             # FIXME: if someone knows easier way to skip installation of tools, please tell me
             self._create_dummy_file(os.path.join("node", "8.9.1_64bit"))
             self._create_dummy_file(os.path.join("java", "8.152_64bit"))
-
+            self._run('%s list' % emsdk)
             self._run('%s install sdk-%s-64bit' % (emsdk, self.version))
             self._run('%s activate sdk-%s-64bit --embedded' % (emsdk, self.version))
 
