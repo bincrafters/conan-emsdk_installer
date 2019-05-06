@@ -11,6 +11,8 @@ class EmSDKInstallerConan(ConanFile):
     description = "Emscripten is an Open Source LLVM to JavaScript compiler"
     url = "https://github.com/bincrafters/conan-emsdk_installer"
     homepage = "https://github.com/kripken/emscripten"
+    author = "Bincrafters <bincrafters@gmail.com>"
+    topcis = ("conan", "emsdk", "emscripten", "installer", "sdk")
     license = "MIT"
     exports = ["LICENSE.md"]
 
@@ -18,14 +20,17 @@ class EmSDKInstallerConan(ConanFile):
         "os_build": ['Windows', 'Linux', 'Macos'],
         "arch_build": ['x86_64']
     }
-    no_copy_source = True
     short_paths = True
     requires = "nodejs_installer/10.15.0@bincrafters/stable"
-    _source_subfolder = "emsdk-%s" % version
+    _source_subfolder = "source_subfolder"
 
     def source(self):
-        source_url = 'https://github.com/emscripten-core/emscripten/archive/%s.zip' % self.version
-        tools.get(source_url)
+        commit = "4eeff61368e7471ae543474e2c36869def9a29fc"
+        sha256 = "cb0cce2a985c7b244f80f39be0f328ed2d68e0eb42cdf69fb5b50d68dd68a00f"
+        source_url = 'https://github.com/emscripten-core/emsdk/archive/%s.tar.gz' % commit
+        tools.get(source_url, sha256=sha256)
+        extracted_folder = "emsdk-%s" % commit
+        os.rename(extracted_folder, self._source_subfolder)
 
     def _run(self, command):
         self.output.info(command)
@@ -44,8 +49,7 @@ class EmSDKInstallerConan(ConanFile):
             os.chmod(filename, os.stat(filename).st_mode | 0o111)
 
     def build(self):
-        emsdk_root = os.path.join(self.source_folder, self._source_subfolder)
-        with tools.chdir(emsdk_root):
+        with tools.chdir(self._source_subfolder):
             emsdk = 'emsdk.bat' if os.name == 'nt' else './emsdk'
             self._chmod_plus_x('emsdk')
             self._run('%s update' % emsdk)
@@ -59,8 +63,8 @@ class EmSDKInstallerConan(ConanFile):
             self._run('%s activate sdk-%s-64bit --embedded' % (emsdk, self.version))
 
     def package(self):
-        self.copy(pattern="LICENSE", dst="licenses", src=self.source_folder)
-        self.copy(pattern='*', dst='.', src=os.path.join(self.source_folder, 'emsdk-master'))
+        self.copy(pattern="LICENSE", dst="licenses", src=self._source_subfolder)
+        self.copy(pattern='*', dst='.', src=self._source_subfolder)
 
     def _define_tool_var(self, name, value):
         suffix = '.bat' if os.name == 'nt' else ''
