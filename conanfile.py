@@ -21,10 +21,10 @@ class EmSDKInstallerConan(ConanFile):
     no_copy_source = True
     short_paths = True
     requires = "nodejs_installer/10.15.0@bincrafters/stable"
-    _source_subfolder = "emsdk-master"
+    _source_subfolder = "emsdk-%s" % self.version
 
     def source(self):
-        source_url = 'https://github.com/juj/emsdk/archive/master.zip'
+        source_url = 'https://github.com/emscripten-core/emscripten/archive/%s.zip' % self.version
         tools.get(source_url)
 
     def _run(self, command):
@@ -62,7 +62,7 @@ class EmSDKInstallerConan(ConanFile):
         self.copy(pattern="LICENSE", dst="licenses", src=self.source_folder)
         self.copy(pattern='*', dst='.', src=os.path.join(self.source_folder, 'emsdk-master'))
 
-    def define_tool_var(self, name, value):
+    def _define_tool_var(self, name, value):
         suffix = '.bat' if os.name == 'nt' else ''
         path = os.path.join(self.package_folder, 'emscripten', self.version, '%s%s' % (value, suffix))
         self._chmod_plus_x(path)
@@ -97,7 +97,7 @@ class EmSDKInstallerConan(ConanFile):
         self.output.info('Creating CONAN_CMAKE_TOOLCHAIN_FILE environment variable: %s' % toolchain)
         self.env_info.CONAN_CMAKE_TOOLCHAIN_FILE = toolchain
 
-        self.env_info.CC = self.define_tool_var('CC', 'emcc')
-        self.env_info.CXX = self.define_tool_var('CXX', 'em++')
-        self.env_info.RANLIB = self.define_tool_var('RANLIB', 'emranlib')
-        self.env_info.AR = self.define_tool_var('AR', 'emar')
+        self.env_info.CC = self._define_tool_var('CC', 'emcc')
+        self.env_info.CXX = self._define_tool_var('CXX', 'em++')
+        self.env_info.RANLIB = self._define_tool_var('RANLIB', 'emranlib')
+        self.env_info.AR = self._define_tool_var('AR', 'emar')
