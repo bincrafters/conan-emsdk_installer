@@ -21,7 +21,7 @@ class EmSDKInstallerConan(ConanFile):
     no_copy_source = True
     short_paths = True
     requires = "nodejs_installer/10.15.0@bincrafters/stable"
-    _source_subfolder = "emsdk-%s" % self.version
+    _source_subfolder = "emsdk-%s" % version
 
     def source(self):
         source_url = 'https://github.com/emscripten-core/emscripten/archive/%s.zip' % self.version
