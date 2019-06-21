@@ -39,6 +39,12 @@ class EmSDKInstallerConan(ConanFile):
             f.write("\n")
 
     @staticmethod
+    def _touch(filename):
+        if not os.path.isfile(filename):
+            with open(filename, "w") as f:
+                f.write("\n")
+
+    @staticmethod
     def _chmod_plus_x(filename):
         if os.name == 'posix':
             os.chmod(filename, os.stat(filename).st_mode | 0o111)
@@ -59,6 +65,15 @@ class EmSDKInstallerConan(ConanFile):
             # FIXME: if someone knows easier way to skip installation of tools, please tell me
             self._create_dummy_file(os.path.join("node", "8.9.1_64bit"))
             self._create_dummy_file(os.path.join("java", "8.152_64bit"))
+            if not os.path.isdir("zips"):
+                os.makedirs("zips")
+            platform = {"Macos": "darwin",
+                        "Windows": "win",
+                        "Linux": "linux"}.get(str(self.settings.os_build))
+            ext = {"Macos": "tar.gz",
+                   "Linux": "tar.xz",
+                   "Windows": "zip"}.get(str(self.settings.os_build))
+            self._touch(os.path.join("zips", "node-v8.9.1-%s-x64.%s" % (platform, ext)))
             self._run('%s list' % emsdk)
             self._run('%s install sdk-%s-64bit' % (emsdk, self.version))
             self._run('%s activate sdk-%s-64bit --embedded' % (emsdk, self.version))
