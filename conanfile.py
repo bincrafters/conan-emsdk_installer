@@ -61,6 +61,17 @@ class EmSDKInstallerConan(ConanFile):
     def package(self):
         self.copy(pattern="LICENSE", dst="licenses", src=self.source_folder)
         self.copy(pattern='*', dst='.', src=os.path.join(self.source_folder, 'emsdk-master'))
+        toolchain = os.path.join(self.package_folder, "emscripten", self.version, "cmake", "Modules", "Platform", "Emscripten.cmake")
+        # allow to find conan libraries
+        tools.replace_in_file(toolchain,
+                              "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)",
+                              "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH)")
+        tools.replace_in_file(toolchain,
+                              "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)",
+                              "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)")
+        tools.replace_in_file(toolchain,
+                              "set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)",
+                              "set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)")
 
     def define_tool_var(self, name, value):
         suffix = '.bat' if os.name == 'nt' else ''
