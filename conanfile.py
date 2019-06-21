@@ -47,8 +47,13 @@ class EmSDKInstallerConan(ConanFile):
         emsdk_root = os.path.join(self.source_folder, self._source_subfolder)
         with tools.chdir(emsdk_root):
             emsdk = 'emsdk.bat' if os.name == 'nt' else './emsdk'
+            if os.path.isfile("python_selector"):
+                self._chmod_plus_x("python_selector")
             self._chmod_plus_x('emsdk')
             self._run('%s update' % emsdk)
+            if os.path.isfile("python_selector"):
+                self._chmod_plus_x("python_selector")
+            self._chmod_plus_x('emsdk')
 
             # skip undesired installation of tools (nodejs, java, python)
             # FIXME: if someone knows easier way to skip installation of tools, please tell me
