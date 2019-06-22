@@ -44,6 +44,12 @@ class EmSDKInstallerConan(ConanFile):
             f.write("\n")
 
     @staticmethod
+    def _touch(filename):
+        if not os.path.isfile(filename):
+            with open(filename, "w") as f:
+                f.write("\n")
+
+    @staticmethod
     def _chmod_plus_x(filename):
         if os.name == 'posix':
             os.chmod(filename, os.stat(filename).st_mode | 0o111)
@@ -51,13 +57,27 @@ class EmSDKInstallerConan(ConanFile):
     def build(self):
         with tools.chdir(self._source_subfolder):
             emsdk = 'emsdk.bat' if os.name == 'nt' else './emsdk'
+            if os.path.isfile("python_selector"):
+                self._chmod_plus_x("python_selector")
             self._chmod_plus_x('emsdk')
             self._run('%s update' % emsdk)
+            if os.path.isfile("python_selector"):
+                self._chmod_plus_x("python_selector")
+            self._chmod_plus_x('emsdk')
 
             # skip undesired installation of tools (nodejs, java, python)
             # FIXME: if someone knows easier way to skip installation of tools, please tell me
             self._create_dummy_file(os.path.join("node", "8.9.1_64bit"))
             self._create_dummy_file(os.path.join("java", "8.152_64bit"))
+            if not os.path.isdir("zips"):
+                os.makedirs("zips")
+            platform = {"Macos": "darwin",
+                        "Windows": "win",
+                        "Linux": "linux"}.get(str(self.settings.os_build))
+            ext = {"Macos": "tar.gz",
+                   "Linux": "tar.xz",
+                   "Windows": "zip"}.get(str(self.settings.os_build))
+            self._touch(os.path.join("zips", "node-v8.9.1-%s-x64.%s" % (platform, ext)))
             self._run('%s list' % emsdk)
             self._run('%s install sdk-%s-64bit' % (emsdk, self.version))
             self._run('%s activate sdk-%s-64bit --embedded' % (emsdk, self.version))
@@ -65,6 +85,19 @@ class EmSDKInstallerConan(ConanFile):
     def package(self):
         self.copy(pattern="LICENSE", dst="licenses", src=self._source_subfolder)
         self.copy(pattern='*', dst='.', src=self._source_subfolder)
+        emsdk = self.package_folder
+        emscripten = os.path.join(emsdk, 'emscripten', self.version)
+        toolchain = os.path.join(emscripten, 'cmake', 'Modules', 'Platform', 'Emscripten.cmake')
+        # allow to find conan libraries
+        tools.replace_in_file(toolchain,
+                              "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)",
+                              "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH)")
+        tools.replace_in_file(toolchain,
+                              "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)",
+                              "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)")
+        tools.replace_in_file(toolchain,
+                              "set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)",
+                              "set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)")
 
     def _define_tool_var(self, name, value):
         suffix = '.bat' if os.name == 'nt' else ''
