@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 from conans import ConanFile, tools
 import os
 
@@ -11,7 +8,6 @@ class EmSDKInstallerConan(ConanFile):
     description = "Emscripten is an Open Source LLVM to JavaScript compiler"
     url = "https://github.com/bincrafters/conan-emsdk_installer"
     homepage = "https://github.com/kripken/emscripten"
-    author = "Bincrafters <bincrafters@gmail.com>"
     topcis = ("conan", "emsdk", "emscripten", "installer", "sdk")
     license = "MIT"
     exports = ["LICENSE.md"]
