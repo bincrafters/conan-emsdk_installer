@@ -21,8 +21,8 @@ class EmSDKInstallerConan(ConanFile):
     _source_subfolder = "source_subfolder"
 
     def source(self):
-        commit = "4eeff61368e7471ae543474e2c36869def9a29fc"
-        sha256 = "cb0cce2a985c7b244f80f39be0f328ed2d68e0eb42cdf69fb5b50d68dd68a00f"
+        commit = "997b0a19ff6fdfe0be8b966e1fed05bf5ebf85e4"
+        sha256 = "f8043866f287176ec92a686ea2357ec13c80f6bc781999e1d0130b95ae97f0df"
         source_url = 'https://github.com/emscripten-core/emsdk/archive/%s.tar.gz' % commit
         tools.get(source_url, sha256=sha256)
         extracted_folder = "emsdk-%s" % commit
