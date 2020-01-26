@@ -4,7 +4,7 @@ import os
 
 class EmSDKInstallerConan(ConanFile):
     name = "emsdk_installer"
-    version = "1.38.29"
+    version = "1.39.6"
     description = "Emscripten is an Open Source LLVM to JavaScript compiler"
     url = "https://github.com/bincrafters/conan-emsdk_installer"
     homepage = "https://github.com/kripken/emscripten"
@@ -75,8 +75,8 @@ class EmSDKInstallerConan(ConanFile):
                    "Windows": "zip"}.get(str(self.settings.os_build))
             self._touch(os.path.join("zips", "node-v8.9.1-%s-x64.%s" % (platform, ext)))
             self._run('%s list' % emsdk)
-            self._run('%s install sdk-%s-64bit' % (emsdk, self.version))
-            self._run('%s activate sdk-%s-64bit --embedded' % (emsdk, self.version))
+            self._run('%s install %s' % (emsdk, self.version))
+            self._run('%s activate %s --embedded' % (emsdk, self.version))
 
     def package(self):
         self.copy(pattern="LICENSE", dst="licenses", src=self._source_subfolder)
