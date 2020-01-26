@@ -82,7 +82,7 @@ class EmSDKInstallerConan(ConanFile):
         self.copy(pattern="LICENSE", dst="licenses", src=self._source_subfolder)
         self.copy(pattern='*', dst='.', src=self._source_subfolder)
         emsdk = self.package_folder
-        emscripten = os.path.join(emsdk, 'emscripten', self.version)
+        emscripten = os.path.join(emsdk, 'upstream', 'emscripten')
         toolchain = os.path.join(emscripten, 'cmake', 'Modules', 'Platform', 'Emscripten.cmake')
         # allow to find conan libraries
         tools.replace_in_file(toolchain,
@@ -105,7 +105,7 @@ class EmSDKInstallerConan(ConanFile):
     def package_info(self):
         emsdk = self.package_folder
         em_config = os.path.join(emsdk, '.emscripten')
-        emscripten = os.path.join(emsdk, 'emscripten', self.version)
+        emscripten = os.path.join(emsdk, 'upstream', 'emscripten')
         em_cache = os.path.join(emsdk, '.emscripten_cache')
         toolchain = os.path.join(emscripten, 'cmake', 'Modules', 'Platform', 'Emscripten.cmake')
 
