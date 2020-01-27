@@ -98,7 +98,7 @@ class EmSDKInstallerConan(ConanFile):
 
     def _define_tool_var(self, name, value):
         suffix = '.bat' if os.name == 'nt' else ''
-        path = os.path.join(self.package_folder, 'emscripten', self.version, '%s%s' % (value, suffix))
+        path = os.path.join(self.package_folder, 'upstream', 'emscripten', '%s%s' % (value, suffix))
         self._chmod_plus_x(path)
         self.output.info('Creating %s environment variable: %s' % (name, path))
         return path
