@@ -10,7 +10,6 @@ class EmSDKInstallerConan(ConanFile):
     homepage = "https://github.com/kripken/emscripten"
     topcis = ("conan", "emsdk", "emscripten", "installer", "sdk")
     license = "MIT"
-    exports = ["LICENSE.md"]
 
     settings = {
         "os_build": ['Windows', 'Linux', 'Macos'],
