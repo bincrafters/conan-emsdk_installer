@@ -4,7 +4,6 @@ import os
 
 class EmSDKInstallerConan(ConanFile):
     name = "emsdk_installer"
-    version = "1.39.6"
     description = "Emscripten is an Open Source LLVM to JavaScript compiler"
     url = "https://github.com/bincrafters/conan-emsdk_installer"
     homepage = "https://github.com/kripken/emscripten"
@@ -21,11 +20,9 @@ class EmSDKInstallerConan(ConanFile):
     _source_subfolder = "source_subfolder"
 
     def source(self):
-        commit = "997b0a19ff6fdfe0be8b966e1fed05bf5ebf85e4"
-        sha256 = "f8043866f287176ec92a686ea2357ec13c80f6bc781999e1d0130b95ae97f0df"
-        source_url = 'https://github.com/emscripten-core/emsdk/archive/%s.tar.gz' % commit
-        tools.get(source_url, sha256=sha256)
-        extracted_folder = "emsdk-%s" % commit
+        source_url = 'https://github.com/emscripten-core/emsdk/archive/%s.tar.gz' % self.version
+        tools.get(source_url)
+        extracted_folder = "emsdk-%s" % self.version
         os.rename(extracted_folder, self._source_subfolder)
 
     def _run(self, command):
