@@ -20,8 +20,7 @@ class EmSDKInstallerConan(ConanFile):
     _source_subfolder = "source_subfolder"
 
     def source(self):
-        source_url = 'https://github.com/emscripten-core/emsdk/archive/%s.tar.gz' % self.version
-        tools.get(source_url)
+        tools.get(**self.conan_data["sources"][self.version])
         extracted_folder = "emsdk-%s" % self.version
         os.rename(extracted_folder, self._source_subfolder)
 
