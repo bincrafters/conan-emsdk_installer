@@ -14,7 +14,6 @@ class EmSDKInstallerConan(ConanFile):
     settings = {
         "os_build": ['Windows', 'Linux', 'Macos'],
         "arch_build": ['x86_64'],
-        "arch": ['x86'],
     }
     short_paths = True
     requires = "nodejs_installer/10.15.0@bincrafters/stable"
