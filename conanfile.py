@@ -63,7 +63,6 @@ class EmSDKInstallerConan(ConanFile):
             # skip undesired installation of tools (nodejs, java, python)
             # FIXME: if someone knows easier way to skip installation of tools, please tell me
             self._create_dummy_file(os.path.join("node", "8.9.1_64bit"))
-            self._create_dummy_file(os.path.join("java", "8.152_64bit"))
             if not os.path.isdir("zips"):
                 os.makedirs("zips")
             platform = {"Macos": "darwin",
