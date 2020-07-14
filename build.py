@@ -17,7 +17,6 @@ if __name__ == "__main__":
     settings['compiler.version'] = '5.0'
     settings['compiler.libcxx'] = 'libc++'
     settings['arch_build'] = 'x86_64'
-    settings['arch'] = 'x86'
 
     if platform.system() == 'Windows':
         settings['os_build'] = 'Windows'
