@@ -13,7 +13,6 @@ class EmSDKInstallerConan(ConanFile):
     settings = {
         "os_build": ['Windows', 'Linux', 'Macos'],
         "arch_build": ['x86_64'],
-        "arch": ['x86'],
     }
     short_paths = True
     requires = "nodejs/12.14.1"
@@ -60,7 +59,6 @@ class EmSDKInstallerConan(ConanFile):
             # skip undesired installation of tools (nodejs, java, python)
             # FIXME: if someone knows easier way to skip installation of tools, please tell me
             self._create_dummy_file(os.path.join("node", "8.9.1_64bit"))
-            self._create_dummy_file(os.path.join("java", "8.152_64bit"))
             if not os.path.isdir("zips"):
                 os.makedirs("zips")
             platform = {"Macos": "darwin",
@@ -90,6 +88,7 @@ class EmSDKInstallerConan(ConanFile):
         tools.replace_in_file(toolchain,
                               "set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)",
                               "set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)")
+
 
     def _define_tool_var(self, name, value):
         suffix = '.bat' if os.name == 'nt' else ''
